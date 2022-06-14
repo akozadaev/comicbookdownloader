@@ -1,18 +1,19 @@
 package com.akozadaev.comicbookdownloader;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.akozadaev.comicbookdownloader.api.model.ComicsDTO;
+import com.akozadaev.comicbookdownloader.api.model.DateDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,16 +47,16 @@ public class MainActivity extends AppCompatActivity {
 
         App app = (App) getApplication();
 
-        disposable.add(app.getService().getApi().getCharacters()
+        disposable.add(app.getService().getApi().getDatesWithPhoto()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new BiConsumer<List<ComicsDTO>, Throwable>() {
+                .subscribe(new BiConsumer<List<DateDTO>, Throwable>() {
                     @Override
-                    public void accept(List<ComicsDTO> dates, Throwable throwable) throws Exception {
+                    public void accept(List<DateDTO> dates, Throwable throwable) throws Exception {
                         if (throwable != null) {
                             Toast.makeText(MainActivity.this, "Data loading error", Toast.LENGTH_SHORT).show();
                         } else {
-                            adapter.setComicses(dates);
+                            adapter.setDates(dates);
                         }
                     }
                 }));
@@ -67,13 +68,13 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private class Adapter extends RecyclerView.Adapter<ViewHolder> {
+    private static class Adapter extends RecyclerView.Adapter<ViewHolder> {
 
-        ArrayList<ComicsDTO> comicsDTOS = new ArrayList<>();
+        ArrayList<DateDTO> dates = new ArrayList<>();
 
-        public void setComicses(List<ComicsDTO> comicses) {
-            this.comicsDTOS.clear();
-            this.comicsDTOS.addAll(comicses);
+        public void setDates(List<DateDTO> dates) {
+            this.dates.clear();
+            this.dates.addAll(dates);
             notifyDataSetChanged();
         }
 
@@ -86,18 +87,18 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-            viewHolder.bind(comicsDTOS.get(i));
+            viewHolder.bind(dates.get(i));
         }
 
         @Override
         public int getItemCount() {
-            return comicsDTOS.size();
+            return dates.size();
         }
     }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
 
-        ComicsDTO comicsDTO;
+        DateDTO dateDTO;
 
         TextView text;
 
@@ -107,14 +108,14 @@ public class MainActivity extends AppCompatActivity {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    CharactersListActivity.start(view.getContext(), comicsDTO.getName());
+                    PhotoListActivity.start(view.getContext(), dateDTO.getDate());
                 }
             });
         }
 
-        public void bind(ComicsDTO comics) {
-            comicsDTO = comics;
-            text.setText(comics.getName());
+        public void bind(DateDTO date) {
+            dateDTO = date;
+            text.setText(date.getDate());
         }
     }
 }
