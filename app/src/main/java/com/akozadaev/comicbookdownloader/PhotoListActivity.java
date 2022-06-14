@@ -1,8 +1,10 @@
 package com.akozadaev.comicbookdownloader;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +23,6 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.BiConsumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class PhotoListActivity extends AppCompatActivity {
@@ -58,14 +59,11 @@ public class PhotoListActivity extends AppCompatActivity {
         disposable.add(app.getService().getApi().getPhotosForDate(getIntent().getStringExtra(EXTRA_DATE))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new BiConsumer<List<PhotoDTO>, Throwable>() {
-                    @Override
-                    public void accept(List<PhotoDTO> photos, Throwable throwable) throws Exception {
-                        if (throwable != null) {
-                            Toast.makeText(PhotoListActivity.this, "Data loading error", Toast.LENGTH_SHORT).show();
-                        } else {
-                            adapter.setPhotos(photos);
-                        }
+                .subscribe((photos, throwable) -> {
+                    if (throwable != null) {
+                        Toast.makeText(PhotoListActivity.this, "Data loading error", Toast.LENGTH_SHORT).show();
+                    } else {
+                        adapter.setPhotos(photos);
                     }
                 }));
     }
@@ -78,8 +76,9 @@ public class PhotoListActivity extends AppCompatActivity {
 
     private static class Adapter extends RecyclerView.Adapter<PhotoItemViewHolder> {
 
-        private ArrayList<PhotoDTO> photos = new ArrayList<>();
+        private final ArrayList<PhotoDTO> photos = new ArrayList<>();
 
+        @SuppressLint("NotifyDataSetChanged")
         public void setPhotos(List<PhotoDTO> photos) {
             this.photos.clear();
             this.photos.addAll(photos);

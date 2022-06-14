@@ -28,7 +28,10 @@
         </activity>
 
         <activity android:name="com.akozadaev.comicbookdownloader.PhotoActivity"
-            android:theme="@style/Theme.AppCompat"/>
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
+<!--         Чтобы использовать свой toolbar как actionBar вам надо в стилях указать, что у актиивити нет ActionBar - т.е. объявление стиля должно быть таким:
+
+<style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">-->
 
         <activity android:name="com.akozadaev.comicbookdownloader.PhotoListActivity"
             android:theme="@style/Theme.AppCompat"/>

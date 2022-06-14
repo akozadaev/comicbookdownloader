@@ -76,7 +76,6 @@ public class ComicsService {
         return httpClient.build();
     }
 
-
     private Retrofit createRetrofit() {
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)

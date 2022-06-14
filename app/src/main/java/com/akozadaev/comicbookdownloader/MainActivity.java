@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
         ArrayList<DateDTO> dates = new ArrayList<>();
+        @SuppressLint("NotifyDataSetChanged")
         public void setDates(List<DateDTO> dates) {
             this.dates.clear();
             this.dates.addAll(dates);
@@ -101,12 +103,7 @@ public class MainActivity extends AppCompatActivity {
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             text = itemView.findViewById(R.id.text);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    PhotoListActivity.start(view.getContext(), dateDTO.getDate());
-                }
-            });
+            itemView.setOnClickListener(view -> PhotoListActivity.start(view.getContext(), dateDTO.getDate()));
         }
 
         public void bind(DateDTO date) {
