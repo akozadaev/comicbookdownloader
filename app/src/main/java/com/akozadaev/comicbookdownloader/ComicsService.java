@@ -1,5 +1,7 @@
 package com.akozadaev.comicbookdownloader;
 
+import android.util.Log;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,13 +20,20 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ComicsService {
-    public static String BASE_URL = "bUPDj3NcY7TPvoShGVEilLJJmiYHzdqyirJx04n4";
-//    for akozad669530727
-//    free account 3000 calls/day
-    public static String PRIVATE_KEY = "bdcb34be1a059d4877a543f3eddb7abebf830f69";
-    public static String PUBLIC_KEY = "0dbad827084dc216c34c7923500ff3ee";
+    public static final String BASE_URL = "https://api.nasa.gov/EPIC/api/";
+    public static final String KEY = "83MY66xw4ME8KUnxzDTaRG91481vhZUFzfbbpvPw";
 
-    ComicsApi api;
+//    Your API key for alexey.kozadaev@gmail.com is:
+//
+//            83MY66xw4ME8KUnxzDTaRG91481vhZUFzfbbpvPw
+//    You can start using this key to make web service requests. Simply pass your key in the URL when making a web request. Here's an example:
+//
+//    https://api.nasa.gov/planetary/apod?api_key=83MY66xw4ME8KUnxzDTaRG91481vhZUFzfbbpvPwx
+//    For additional support, please contact us. When contacting us, please tell us what API you're accessing and provide the following account details so we can quickly find you:
+//
+//    Account Email: alexey.kozadaev@gmail.com
+//    Account ID: b3318c39-8360-4695-9dee-b3b546f524a2
+    final ComicsApi api;
 
     public ComicsService() {
         Retrofit retrofit = createRetrofit();
@@ -37,10 +46,6 @@ public class ComicsService {
 
     private OkHttpClient createOkHttpClient() {
         final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        Date date = new Date();
-        Timestamp ts = new Timestamp(date.getTime());
-        String hash = DigestUtils
-                .md5Hex(ts + PRIVATE_KEY + PUBLIC_KEY);
         httpClient.addInterceptor(new Interceptor() {
             @NotNull
             @Override
@@ -48,9 +53,7 @@ public class ComicsService {
                 final Request original = chain.request();
                 final HttpUrl originalHttpUrl = original.url();
                 final HttpUrl url = originalHttpUrl.newBuilder()
-                        .addQueryParameter("apikey", PUBLIC_KEY)
-                        .addQueryParameter("hash", hash)
-                        .addQueryParameter("ts", ts.toString())
+                        .addQueryParameter("api_key", KEY)
                         .build();
                 final Request.Builder requestBuilder = original.newBuilder()
                         .url(url);
@@ -58,12 +61,14 @@ public class ComicsService {
                 return chain.proceed(request);
             }
         });
+
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.level(HttpLoggingInterceptor.Level.BODY);
         httpClient.addInterceptor(logging);
 
         return httpClient.build();
     }
+
 
     private Retrofit createRetrofit() {
         return new Retrofit.Builder()
