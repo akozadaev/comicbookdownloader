@@ -55,10 +55,17 @@ public class ComicsService {
                 final HttpUrl url = originalHttpUrl.newBuilder()
                         .addQueryParameter("api_key", KEY)
                         .build();
+
+                Log.d("url", url.toString());
                 final Request.Builder requestBuilder = original.newBuilder()
                         .url(url);
                 final Request request = requestBuilder.build();
-                return chain.proceed(request);
+                try {
+                    return chain.proceed(request);
+                } catch (Throwable t) {
+                    Log.e("Error" , t.getMessage());
+                }
+                return null;
             }
         });
 

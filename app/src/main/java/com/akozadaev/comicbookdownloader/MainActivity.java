@@ -2,6 +2,7 @@ package com.akozadaev.comicbookdownloader;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,14 +51,11 @@ public class MainActivity extends AppCompatActivity {
         disposable.add(app.getService().getApi().getDatesWithPhoto()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new BiConsumer<List<DateDTO>, Throwable>() {
-                    @Override
-                    public void accept(List<DateDTO> dates, Throwable throwable) throws Exception {
-                        if (throwable != null) {
-                            Toast.makeText(MainActivity.this, "Data loading error", Toast.LENGTH_SHORT).show();
-                        } else {
-                            adapter.setDates(dates);
-                        }
+                .subscribe((dates, throwable) -> {
+                    if (throwable != null) {
+                        Toast.makeText(MainActivity.this, throwable.toString(), Toast.LENGTH_SHORT).show();
+                    } else {
+                        adapter.setDates(dates);
                     }
                 }));
     }
@@ -68,10 +66,8 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private static class Adapter extends RecyclerView.Adapter<ViewHolder> {
-
+    private class Adapter extends RecyclerView.Adapter<ViewHolder> {
         ArrayList<DateDTO> dates = new ArrayList<>();
-
         public void setDates(List<DateDTO> dates) {
             this.dates.clear();
             this.dates.addAll(dates);
